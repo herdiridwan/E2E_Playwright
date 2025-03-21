@@ -1,0 +1,229 @@
+# Instructions
+
+- Following Playwright test failed.
+- Explain why, be concise, respect Playwright best practices.
+- Provide a snippet of code with the fix, if possible.
+
+# Test info
+
+- Name: Technical Login Tests >> TC.007 - Login with empty username and password
+- Location: C:\Users\HP\Desktop\HARP\TechnicalTest\E2E_Playwright\tests\login.test.js:111:9
+
+# Error details
+
+```
+Error: expect(received).toEqual(expected) // deep equality
+
+Expected: "Username is required"
+Received: "Epic sadface: Username is required"
+    at C:\Users\HP\Desktop\HARP\TechnicalTest\E2E_Playwright\tests\login.test.js:119:30
+```
+
+# Page snapshot
+
+```yaml
+- text: Swag Labs
+- textbox "Username"
+- textbox "Password"
+- 'heading "Epic sadface: Username is required" [level=3]':
+  - button
+  - text: "Epic sadface: Username is required"
+- button "Login"
+- heading "Accepted usernames are:" [level=4]
+- text: standard_user locked_out_user problem_user performance_glitch_user error_user visual_user
+- heading "Password for all users:" [level=4]
+- text: secret_sauce
+```
+
+# Test source
+
+```ts
+   19 |
+   20 |     test('TC.001 - Login with valid credentials', async ({ page }) => {
+   21 |         const loginPage = new LoginPage(page);
+   22 |         const dashboardPage = new DashboardPage(page);
+   23 |
+   24 |         try {
+   25 |             await loginPage.goto();
+   26 |             await loginPage.login(process.env.ADMIN_USERNAME, process.env.ADMIN_PASSWORD);
+   27 |             console.log("Verifying dashboard visibility...");
+   28 |             const isDashboardVisible = await dashboardPage.isDashboardVisible();
+   29 |         } catch (error) {
+   30 |             console.error('Test failed:', error);
+   31 |             fs.writeFileSync('error.log', error.toString()); 
+   32 |             throw error; 
+   33 |         }
+   34 |     });
+   35 |
+   36 |     test('TC.002 - Login with invalid credentials', async ({ page }) => {
+   37 |         const loginPage = new LoginPage(page);
+   38 |
+   39 |         try {
+   40 |             await loginPage.goto();
+   41 |             await loginPage.login('invalidUser1', 'wrongPass1');
+   42 |
+   43 |             const errorMsg = await loginPage.getErrorMessage();
+   44 |             expect(errorMsg).toContain('Username and password do not match any user in this service');
+   45 |         } catch (error) {
+   46 |             fs.writeFileSync('error.log', error.toString()); 
+   47 |             throw error; 
+   48 |         }
+   49 |     });
+   50 |
+   51 |     test('TC.003 - Login with wrong password', async ({ page }) => {
+   52 |         const loginPage = new LoginPage(page);
+   53 |
+   54 |         try {
+   55 |             await loginPage.goto();
+   56 |             await loginPage.login(process.env.ADMIN_USERNAME, 'wrongPassword123');
+   57 |
+   58 |             const errorMsg = await loginPage.getErrorMessage();
+   59 |             expect(errorMsg).toContain('Username and password do not match any user in this service');
+   60 |         } catch (error) {
+   61 |             fs.writeFileSync('error.log', error.toString()); 
+   62 |             throw error; 
+   63 |         }
+   64 |     });
+   65 |
+   66 |     test('TC.004 - Login with wrong username', async ({ page }) => {
+   67 |         const loginPage = new LoginPage(page);
+   68 |
+   69 |         try {
+   70 |             await loginPage.goto();
+   71 |             await loginPage.login('wrongUsername', process.env.ADMIN_PASSWORD);
+   72 |
+   73 |             const errorMsg = await loginPage.getErrorMessage();
+   74 |             expect(errorMsg).toContain('Username and password do not match any user in this service');
+   75 |         } catch (error) {
+   76 |             fs.writeFileSync('error.log', error.toString()); 
+   77 |             throw error; 
+   78 |         }
+   79 |     });
+   80 |
+   81 |     test('TC.005 - Login with empty username', async ({ page }) => {
+   82 |         const loginPage = new LoginPage(page);
+   83 |
+   84 |         try {
+   85 |             await loginPage.goto();
+   86 |             await loginPage.login('', process.env.ADMIN_PASSWORD);
+   87 |
+   88 |             const errorMsg = await loginPage.geterrorfield();
+   89 |             expect(errorMsg).toContain('Username is required');
+   90 |         } catch (error) {
+   91 |             fs.writeFileSync('error.log', error.toString()); 
+   92 |             throw error; 
+   93 |         }
+   94 |     });
+   95 |
+   96 |     test('TC.006 - Login with empty password', async ({ page }) => {
+   97 |         const loginPage = new LoginPage(page);
+   98 |
+   99 |         try {
+  100 |             await loginPage.goto();
+  101 |             await loginPage.login(process.env.ADMIN_USERNAME, '');
+  102 |
+  103 |             const errorMsg = await loginPage.geterrorfield();
+  104 |             expect(errorMsg).toContain('Password is required');
+  105 |         } catch (error) {
+  106 |             fs.writeFileSync('error.log', error.toString()); 
+  107 |             throw error; 
+  108 |         }
+  109 |     });
+  110 |
+  111 |     test('TC.007 - Login with empty username and password', async ({ page }) => {
+  112 |         const loginPage = new LoginPage(page);
+  113 |
+  114 |         try {
+  115 |             await loginPage.goto();
+  116 |             await loginPage.login('', '');
+  117 |
+  118 |             const errorMsg = await loginPage.geterrorfield();
+> 119 |             expect(errorMsg).toEqual('Username is required');
+      |                              ^ Error: expect(received).toEqual(expected) // deep equality
+  120 |         } catch (error) {
+  121 |             fs.writeFileSync('error.log', error.toString()); 
+  122 |             throw error; 
+  123 |         }
+  124 |     });
+  125 |
+  126 |     test('TC.008 - Login with special character in username', async ({ page }) => {
+  127 |         const loginPage = new LoginPage(page);
+  128 |
+  129 |         try {
+  130 |             await loginPage.goto();
+  131 |             await loginPage.login('admin@#$', process.env.ADMIN_PASSWORD);
+  132 |
+  133 |             const errorMsg = await loginPage.getErrorMessage();
+  134 |             expect(errorMsg).toContain('Username and password do not match any user in this service');
+  135 |         } catch (error) {
+  136 |             fs.writeFileSync('error.log', error.toString()); 
+  137 |             throw error; 
+  138 |         }
+  139 |     });
+  140 |
+  141 |     test('TC.009 - Login with special character in password', async ({ page }) => {
+  142 |         const loginPage = new LoginPage(page);
+  143 |
+  144 |         try {
+  145 |             await loginPage.goto();
+  146 |             await loginPage.login(process.env.ADMIN_USERNAME, 'P@ssw0rd!@#$%^&*');
+  147 |
+  148 |             const errorMsg = await loginPage.getErrorMessage();
+  149 |             expect(errorMsg).toContain('Username and password do not match any user in this service');
+  150 |         } catch (error) {
+  151 |             fs.writeFileSync('error.log', error.toString()); 
+  152 |             throw error; 
+  153 |         }
+  154 |     });
+  155 |
+  156 |     test('TC.010 - Login with SQL Injection', async ({ page }) => {
+  157 |         const loginPage = new LoginPage(page);
+  158 |
+  159 |         try {
+  160 |             await loginPage.goto();
+  161 |             await loginPage.login("admin' OR 1=1 --", 'password');
+  162 |
+  163 |             const errorMsg = await loginPage.getErrorMessage();
+  164 |             expect(errorMsg).toContain('Username and password do not match any user in this service');
+  165 |         } catch (error) {
+  166 |             fs.writeFileSync('error.log', error.toString()); 
+  167 |             throw error; 
+  168 |         }
+  169 |     });
+  170 |
+  171 |     test('TC.011 - Login Looping invalid Password (Brute Force)', async ({ page }) => {
+  172 |         const loginPage = new LoginPage(page);
+  173 |         try {
+  174 |             await loginPage.goto();
+  175 |
+  176 |             for (let i = 0; i < 6; i++) {
+  177 |                 await loginPage.login(process.env.ADMIN_USERNAME, `wrongPass${i}`);
+  178 |             }
+  179 |
+  180 |             const errorMsg = await loginPage.getErrorMessage();
+  181 |             expect(errorMsg).toContain('Username and password do not match any user in this service');
+  182 |         } catch (error) {
+  183 |             fs.writeFileSync('error.log', error.toString()); 
+  184 |             throw error; 
+  185 |         }
+  186 |     });
+  187 |
+  188 |     test('TC.012 - Login until get expired token', async ({ page }) => {
+  189 |         const loginPage = new LoginPage(page);
+  190 |
+  191 |         try {
+  192 |             await loginPage.goto();
+  193 |             await loginPage.login(process.env.ADMIN_USERNAME, process.env.ADMIN_PASSWORD);
+  194 |
+  195 |             await page.waitForTimeout(3600000); 
+  196 |
+  197 |             await page.reload();
+  198 |             const errorMsg = await loginPage.getErrorMessage();
+  199 |             expect(errorMsg).toContain('Session expired. Please login again.');
+  200 |         } catch (error) {
+  201 |             fs.writeFileSync('error.log', error.toString()); 
+  202 |             throw error; 
+  203 |         }
+  204 |     });
+  205 | });
+```

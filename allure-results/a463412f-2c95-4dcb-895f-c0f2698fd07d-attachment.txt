@@ -1,0 +1,1 @@
+❌ Test failed: TC.007 - Login with empty username and password

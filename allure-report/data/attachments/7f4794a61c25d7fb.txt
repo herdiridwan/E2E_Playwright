@@ -1,0 +1,1 @@
+❌ Test failed: TC.012 - Login until get expired token
